@@ -1,8 +1,34 @@
 import pang
 import pygame
 
-def event_handling():
-	
+def event_handling(state):
+	if state is pang.STAT_IN_GAME:
+		for event in pygame.event.get():
+			if event.type == pygame.QUIT:
+				return False
+
+			if event.type == pygame.KEYDOWN:
+				if event.key == pygame.K_LEFT: # 캐릭터를 왼쪽으로
+					player1.to_x -= player1.speed
+				elif event.key == pygame.K_RIGHT: # 캐릭터를 오른쪽으로
+					player1.to_x += player1.speed
+				elif event.key == pygame.K_SPACE: # 무기 발사
+					weapon_x_pos = player1.x_pos + (player1.width / 2) - (player1.weapon.width / 2)
+					weapon_y_pos = player1.y_pos
+					player1.weapon.bullets.append([weapon_x_pos, weapon_y_pos])
+		
+			if event.type == pygame.KEYUP:
+				if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
+					player1.to_x = 0
+	# else:
+	# 	for event in pygame.event.get():
+	# 		if event.type == pygame.KEYDOWN:
+	# 			if event.key == pygame.K_1:
+	# 				global player_num = 1
+	# 			elif event.key == pygame.K_2:
+	# 				global player_num = 2
+	return True
+
 ##############################################################
 # 기본 초기화 (반드시 해야 하는 것들)
 pygame.init()
@@ -17,6 +43,8 @@ pygame.display.set_caption("Copy Pang")
 
 # FPS
 clock = pygame.time.Clock()
+game_state = pang.STAT_IN_GAME
+player_num = 1
 
 # 배경 만들기
 background = pygame.image.load("./images/background.png")
@@ -43,24 +71,25 @@ game_result = "Game Over"
 running = True
 while running:
 	dt = clock.tick(30) # 30 FPS
+	running = event_handling(game_state)
 	# 2. 이벤트 처리 (키보드, 마우스 등)
-	for event in pygame.event.get():
-		if event.type == pygame.QUIT:
-			running = False 
+	# for event in pygame.event.get():
+	# 	if event.type == pygame.QUIT:
+	# 		running = False 
 
-		if event.type == pygame.KEYDOWN:
-			if event.key == pygame.K_LEFT: # 캐릭터를 왼쪽으로
-				player1.to_x -= player1.speed
-			elif event.key == pygame.K_RIGHT: # 캐릭터를 오른쪽으로
-				player1.to_x += player1.speed
-			elif event.key == pygame.K_SPACE: # 무기 발사
-				weapon_x_pos = player1.x_pos + (player1.width / 2) - (player1.weapon.width / 2)
-				weapon_y_pos = player1.y_pos
-				player1.weapon.bullets.append([weapon_x_pos, weapon_y_pos])
+	# 	if event.type == pygame.KEYDOWN:
+	# 		if event.key == pygame.K_LEFT: # 캐릭터를 왼쪽으로
+	# 			player1.to_x -= player1.speed
+	# 		elif event.key == pygame.K_RIGHT: # 캐릭터를 오른쪽으로
+	# 			player1.to_x += player1.speed
+	# 		elif event.key == pygame.K_SPACE: # 무기 발사
+	# 			weapon_x_pos = player1.x_pos + (player1.width / 2) - (player1.weapon.width / 2)
+	# 			weapon_y_pos = player1.y_pos
+	# 			player1.weapon.bullets.append([weapon_x_pos, weapon_y_pos])
 		
-		if event.type == pygame.KEYUP:
-			if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
-				player1.to_x = 0
+	# 	if event.type == pygame.KEYUP:
+	# 		if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
+	# 			player1.to_x = 0
 
 	# 3. 게임 캐릭터 위치 정의
 	player1.location(screen_width)

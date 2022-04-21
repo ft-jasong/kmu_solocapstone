@@ -127,6 +127,7 @@ class game:
 		if pl_num == 2:
 			self.player1 = Character("./images/character.png", self.window_width, self.window_height, stage_height)
 
+	# def colide
 	def pang_exit(self):
 		pygame.time.delay(2000)
 		pygame.quit()

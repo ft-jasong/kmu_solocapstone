@@ -1,3 +1,4 @@
+from soupsieve import select
 import pang
 import pygame
 
@@ -5,7 +6,7 @@ def event_handling(state):
 	if state is pang.STAT_IN_GAME:
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
-				return False
+				return pang.STAT_IN_GAME, False
 
 			if event.type == pygame.KEYDOWN:
 				if event.key == pygame.K_LEFT: # 캐릭터를 왼쪽으로
@@ -20,14 +21,22 @@ def event_handling(state):
 			if event.type == pygame.KEYUP:
 				if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
 					player1.to_x = 0
-	# else:
-	# 	for event in pygame.event.get():
-	# 		if event.type == pygame.KEYDOWN:
-	# 			if event.key == pygame.K_1:
-	# 				global player_num = 1
-	# 			elif event.key == pygame.K_2:
-	# 				global player_num = 2
-	return True
+	else:
+		global player_num
+		global start_ticks
+		for event in pygame.event.get():
+			if event.type == pygame.QUIT:
+				return state, False
+			if event.type == pygame.KEYDOWN:
+				if event.key == pygame.K_1:
+					player_num = 1
+					state = pang.STAT_IN_GAME
+					start_ticks = pygame.time.get_ticks()
+				elif event.key == pygame.K_2:
+					player_num = 2
+					start_ticks = pygame.time.get_ticks()
+					state = pang.STAT_IN_GAME
+	return state, True
 
 ##############################################################
 # 기본 초기화 (반드시 해야 하는 것들)
@@ -43,7 +52,7 @@ pygame.display.set_caption("Copy Pang")
 
 # FPS
 clock = pygame.time.Clock()
-game_state = pang.STAT_IN_GAME
+game_state = pang.STAT_SELECT
 player_num = 1
 
 # 배경 만들기
@@ -60,38 +69,26 @@ ball = pang.Ball("./images/balloon", 50, 50)
 # Font 정의
 game_font = pygame.font.Font(None, 40)
 total_time = 100
-start_ticks = pygame.time.get_ticks() # 시작 시간 정의
+# start_ticks = pygame.time.get_ticks() # 시작 시간 정의
 
 # 게임 종료 메시지 
 # Time Over(시간 초과 실패)
 # Mission Complete(성공)
 # Game Over (캐릭터 공에 맞음, 실패)
-game_result = "Game Over"
+game_result = ""
 
 running = True
 while running:
 	dt = clock.tick(30) # 30 FPS
-	running = event_handling(game_state)
-	# 2. 이벤트 처리 (키보드, 마우스 등)
-	# for event in pygame.event.get():
-	# 	if event.type == pygame.QUIT:
-	# 		running = False 
+	game_state, running = event_handling(game_state)
+	if game_state is pang.STAT_SELECT:
+		select_msg = "Press player numbers to play"
+		announce = game_font.render(select_msg, True, (255, 255, 0)) # 노란색
+		announce_rect = announce.get_rect(center=(int(screen_width / 2), int(screen_height / 2)))
+		screen.blit(announce, announce_rect)
+		pygame.display.update()
+		continue
 
-	# 	if event.type == pygame.KEYDOWN:
-	# 		if event.key == pygame.K_LEFT: # 캐릭터를 왼쪽으로
-	# 			player1.to_x -= player1.speed
-	# 		elif event.key == pygame.K_RIGHT: # 캐릭터를 오른쪽으로
-	# 			player1.to_x += player1.speed
-	# 		elif event.key == pygame.K_SPACE: # 무기 발사
-	# 			weapon_x_pos = player1.x_pos + (player1.width / 2) - (player1.weapon.width / 2)
-	# 			weapon_y_pos = player1.y_pos
-	# 			player1.weapon.bullets.append([weapon_x_pos, weapon_y_pos])
-		
-	# 	if event.type == pygame.KEYUP:
-	# 		if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
-	# 			player1.to_x = 0
-
-	# 3. 게임 캐릭터 위치 정의
 	player1.location(screen_width)
 	player1.weapon.bullet_move()
 	
@@ -114,6 +111,7 @@ while running:
 		# 공과 캐릭터 충돌 체크
 		if player1.rect.colliderect(ball_rect):
 			running = False
+			game_result = "Game Over"
 			break
 
 		# 공과 무기들 충돌 처리

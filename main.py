@@ -1,4 +1,3 @@
-from soupsieve import select
 import pang
 import pygame
 
@@ -69,7 +68,6 @@ ball = pang.Ball("./images/balloon", 50, 50)
 # Font 정의
 game_font = pygame.font.Font(None, 40)
 total_time = 100
-# start_ticks = pygame.time.get_ticks() # 시작 시간 정의
 
 # 게임 종료 메시지 
 # Time Over(시간 초과 실패)
@@ -82,7 +80,7 @@ while running:
 	dt = clock.tick(30) # 30 FPS
 	game_state, running = event_handling(game_state)
 	if game_state is pang.STAT_SELECT:
-		select_msg = "Press player numbers to play"
+		select_msg = "Press player numbers to play[1]: Player 1[2]: Player 2[3]Two Player"
 		announce = game_font.render(select_msg, True, (255, 255, 0)) # 노란색
 		announce_rect = announce.get_rect(center=(int(screen_width / 2), int(screen_height / 2)))
 		screen.blit(announce, announce_rect)

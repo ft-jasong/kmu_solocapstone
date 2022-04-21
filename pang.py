@@ -3,6 +3,35 @@ import pygame
 STAT_SELECT = 1
 STAT_IN_GAME = 2
 
+class Spritesheet(object):
+	def __init__(self, filename):
+		try:
+			self.sheet = pygame.image.load(filename).convert()
+		except pygame.error as message:
+			print('Unable to load spritesheet image:', filename)
+			raise SystemExit(message)
+	# Load a specific image from a specific rectangle
+	def image_at(self, rectangle, colorkey = None):
+		"Loads image from x, y, x+offset, y+offset"
+		rect = pygame.Rect(rectangle)
+		image = pygame.Surface(rect.size).convert()
+		image.blit(self.sheet, (0, 0), rect)
+		if colorkey != None:
+			if colorkey == -1:
+				colorkey = image.get_at((0,0))
+			image.set_colorkey(colorkey, pygame.RLEACCEL)
+		return image
+	# Load a whole bunch of images and return them as a list
+	def images_at(self, rects, colorkey = None):
+		"Loads multiple images, supply a list of coordinates"
+		return [self.image_at(rect, colorkey) for rect in rects]
+	# Load a whole strip of images
+	def load_strip(self, rect, image_count, colorkey = None):
+		"Loads a strip of images and returns them as a list"
+		tups = [(rect[0]+(2+rect[2])*x, rect[1], rect[2], rect[3])
+				for x in range(image_count)]
+		return self.images_at(tups, colorkey)
+
 class Stage:
 	def __init__(self, filename):
 		self.img = pygame.image.load(filename)
@@ -27,10 +56,14 @@ class Weapon:
 		if self.bullet_to_remove > -1:
 			del self.bullets[self.bullet_to_remove]
 			self.bullet_to_remove = -1
-			
+
 class Character:
 	def __init__(self, filename, screen_width, screen_height, stage_height):
-		self.img = pygame.image.load(filename)
+		self.ss = Spritesheet(filename)
+		self.imgs_right = self.ss.load_strip((0, 0, 32, 32), 5, colorkey=-1)
+		self.imgs_left = [pygame.transform.flip(img,True,False) for img in self.imgs_right]
+		self.img = self.imgs_right[3]
+		self.img = self.imgs_left[3]
 		self.rect = self.img.get_rect()
 		self.size = self.rect.size
 		self.width = self.size[0]
@@ -96,7 +129,7 @@ class Ball:
 
 			ball_val["pos_x"] += ball_val["to_x"]
 			ball_val["pos_y"] += ball_val["to_y"]
-		
+
 	def delete_ball(self):
 		if self.ball_to_remove > -1:
 			del self.balls[self.ball_to_remove]
@@ -112,6 +145,7 @@ class game:
 
 		# Set Clock
 		self.clock = pygame.time.Clock()
+		self.state = STAT_SELECT
 		self.stage = Stage("./images/stage.png")
 		self.font = pygame.font.Font(None, 40)
 		self.total_time = 100
@@ -120,7 +154,7 @@ class game:
 
 	def load_bg(self, bg_name):
 		self.background = pygame.image.load("./images/" + str(bg_name))
-	
+
 	def set_player(self, stage_height, pl_num):
 		if pl_num == 1:
 			self.player1 = Character("./images/character.png", self.window_width, self.window_height, stage_height)

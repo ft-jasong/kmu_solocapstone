@@ -1,4 +1,3 @@
-from pydoc import plain
 import pygame
 
 STAT_SELECT = 1
@@ -161,18 +160,15 @@ class Ball:
 			ball_size = self.img[ball_img_idx].get_rect().size
 			ball_width = ball_size[0]
 			ball_height = ball_size[1]
-
 			# 가로벽에 닿았을 때 공 이동 위치 변경 (튕겨 나오는 효과)
 			if ball_pos_x < 18 or ball_pos_x > (screen_width - 18) - ball_width:
 				ball_val["to_x"] = ball_val["to_x"] * -1
-
 			# 세로 위치
 			# 스테이지에 튕겨서 올라가는 처리
 			if ball_pos_y >= screen_height - stage_height - ball_height:
 				ball_val["to_y"] = ball_val["init_spd_y"]
 			else: # 그 외의 모든 경우에는 속도를 증가
-				ball_val["to_y"] += 0.5
-
+				ball_val["to_y"] += 0.5!~
 			ball_val["pos_x"] += ball_val["to_x"]
 			ball_val["pos_y"] += ball_val["to_y"]
 

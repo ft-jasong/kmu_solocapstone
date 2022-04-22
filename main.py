@@ -61,8 +61,8 @@ def event_handling(state):
 
 ##############################################################
 # 기본 초기화 (반드시 해야 하는 것들)
-pygame.init()
 
+pygame.init()
 game = pang.game()
 game_result = "Game Exit"
 running = True

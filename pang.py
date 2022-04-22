@@ -184,6 +184,7 @@ class Ball:
 class game:
 	def __init__(self):
 		pygame.init()
+		pygame.mixer.init()
 		self.screen_width = 640
 		self.screen_height = 480
 		self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
@@ -202,6 +203,8 @@ class game:
 			self.ball.img[i] = image_at(self.ball.img[i], self.ball.rectangle[i], -1)
 		self.start_ticks = pygame.time.get_ticks() # 시작 시간 정의
 		# self.game_result = "Game Over"
+		self.gunshot = pygame.mixer.Sound("./sounds/gunshot.wav")
+		self.balloonpop = pygame.mixer.Sound("./sounds/balloonpop.wav")
 
 
 	def set_player(self, stage_height, pl_num=1):
@@ -262,6 +265,7 @@ class game:
 
 				# 충돌 체크
 				if weapon_rect.colliderect(ball_rect):
+					self.balloonpop.play()
 					self.player1.weapon.bullet_to_remove = weapon_idx # 해당 무기 없애기 위한 값 설정
 					self.ball.ball_to_remove = ball_idx # 해당 공 없애기 위한 값 설정
 					self.ball.delete_ball()
@@ -328,6 +332,7 @@ class game:
 
 					# 충돌 체크
 					if weapon_rect.colliderect(ball_rect):
+						self.balloonpop.play()
 						self.player2.weapon.bullet_to_remove = weapon_idx # 해당 무기 없애기 위한 값 설정
 						self.ball.ball_to_remove = ball_idx # 해당 공 없애기 위한 값 설정
 						self.ball.delete_ball()

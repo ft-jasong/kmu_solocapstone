@@ -19,6 +19,7 @@ def event_handling(state):
 					weapon_x_pos = game.player1.x_pos + (game.player1.width / 2) - (game.player1.weapon.width / 2)
 					weapon_y_pos = game.player1.y_pos
 					game.player1.weapon.bullets.append([weapon_x_pos, weapon_y_pos])
+					game.gunshot.play()
 		
 			if event.type == pygame.KEYUP:
 				if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
@@ -38,6 +39,8 @@ def event_handling(state):
 						weapon_x_pos = game.player2.x_pos + (game.player2.width / 2) - (game.player2.weapon.width / 2)
 						weapon_y_pos = game.player2.y_pos
 						game.player2.weapon.bullets.append([weapon_x_pos, weapon_y_pos])
+						game.gunshot.play()
+
 		
 				if event.type == pygame.KEYUP:
 					if event.key == pygame.K_a or event.key == pygame.K_d:

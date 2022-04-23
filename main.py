@@ -34,7 +34,7 @@ def event_handling(state):
 					elif event.key == pygame.K_d: # 캐릭터를 오른쪽으로
 						game.player2.to_x += game.player2.speed
 						game.player2.walk_sprite = 0
-						game.player2.walk_dir = 1
+						game.player2.walk_dir = 2
 					elif event.key == pygame.K_s: # 무기 발사
 						weapon_x_pos = game.player2.x_pos + (game.player2.width / 2) - (game.player2.weapon.width / 2)
 						weapon_y_pos = game.player2.y_pos
@@ -45,6 +45,8 @@ def event_handling(state):
 				if event.type == pygame.KEYUP:
 					if event.key == pygame.K_a or event.key == pygame.K_d:
 						game.player2.to_x = 0
+						game.player2.walk_dir = 1
+
 	else:
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
